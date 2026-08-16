@@ -1,5 +1,12 @@
-import "dotenv/config";
 import { resolve } from "node:path";
+
+// Em produção, o Railway injeta as variáveis de ambiente diretamente em
+// `process.env`, então carregar o dotenv (que tenta ler um arquivo `.env`
+// inexistente) pode causar conflitos e falhas na inicialização do bot.
+// Por isso, o dotenv só é importado fora do ambiente de produção.
+if (process.env.NODE_ENV !== "production") {
+  await import("dotenv/config");
+}
 
 /**
  * Ponto único de leitura das variáveis de ambiente do bot.
