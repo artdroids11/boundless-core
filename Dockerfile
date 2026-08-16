@@ -20,6 +20,8 @@ RUN chmod +x ./scripts/start-production.sh
 
 RUN npm run typecheck
 
+RUN npm run build
+
 ENV NODE_ENV=production
 
 CMD ["./scripts/start-production.sh"]
