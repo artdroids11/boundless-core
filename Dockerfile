@@ -20,4 +20,4 @@ RUN npm run typecheck
 
 ENV NODE_ENV=production
 
-CMD ["npm", "run", "start:railway"]
+CMD ["./scripts/start-production.sh"]
