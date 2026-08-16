@@ -1,0 +1,378 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model GuildConfig {
+  id      String @id @default(cuid())
+  guildId String @unique
+
+  prefix              String  @default("b!")
+  legacyPrefixEnabled Boolean @default(true)
+
+  adminRoleId     String?
+  moderatorRoleId String?
+  supportRoleId   String?
+
+  logChannelModerationId String?
+  logChannelAdminId      String?
+  logChannelSystemId     String?
+  welcomeChannelId       String?
+  memberRoleId           String?
+
+  xpEnabled         Boolean @default(true)
+  xpCooldownSeconds Int     @default(60)
+  xpMin              Int     @default(10)
+  xpMax              Int     @default(18)
+
+  prestigeDailyLimit Int    @default(150)
+  timezone            String @default("America/Sao_Paulo")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("guild_configs")
+}
+
+model User {
+  id      String @id @default(cuid())
+  userId  String
+  guildId String
+
+  xp       Int @default(0)
+  level    Int @default(1)
+  messages Int @default(0)
+
+  lastXpAt        DateTime?
+  lastMessageHash String?
+  joinedAt        DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@unique([userId, guildId])
+  @@index([guildId, xp])
+  @@map("users")
+}
+
+enum ModerationType {
+  WARN
+  TIMEOUT
+  TIMEOUT_REMOVE
+  KICK
+  BAN
+  UNBAN
+}
+
+model ModerationCase {
+  id      String @id @default(cuid())
+  guildId String
+
+  userId      String
+  moderatorId String
+  type        ModerationType
+  reason      String
+
+  durationSeconds Int?
+  expiresAt       DateTime?
+  active          Boolean   @default(true)
+  evidenceUrl     String?
+
+  revokedAt DateTime?
+  revokedBy String?
+  createdAt DateTime @default(now())
+
+  @@index([guildId, userId, createdAt])
+  @@index([guildId, active])
+  @@map("moderation_cases")
+}
+
+model AuditLog {
+  id         String @id @default(cuid())
+  guildId    String
+  actorId    String
+  action     String
+  targetId   String?
+  entityType String?
+  entityId   String?
+  details    String?
+  createdAt  DateTime @default(now())
+
+  @@index([guildId, createdAt])
+  @@map("audit_logs")
+}
+
+model HierarchyAssignment {
+  id        String @id @default(cuid())
+  guildId   String
+  userId    String
+  rank      String
+  grantedBy String
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([guildId, userId])
+  @@index([guildId, rank])
+  @@map("hierarchy_assignments")
+}
+
+enum CouncilType {
+  MILITAR
+  EXPLORACAO
+  NAVAL
+  LOGISTICA
+  RELACOES
+}
+
+model CouncilMembership {
+  id          String @id @default(cuid())
+  guildId     String
+  userId      String
+  council     CouncilType
+  position    String @default("Conselheiro")
+  appointedBy String
+  createdAt   DateTime @default(now())
+
+  @@unique([guildId, userId, council])
+  @@index([guildId, council])
+  @@map("council_memberships")
+}
+
+model SpecializationAssignment {
+  id        String @id @default(cuid())
+  guildId   String
+  userId    String
+  name      String
+  grantedBy String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@unique([guildId, userId, name])
+  @@index([guildId, name])
+  @@map("specialization_assignments")
+}
+
+enum DepthTier {
+  T1
+  T2
+  T3
+  T4
+  T5
+}
+
+model DepthAssignment {
+  id        String @id @default(cuid())
+  guildId   String
+  userId    String
+  area      String
+  tier      DepthTier
+  grantedBy String
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([guildId, userId, area])
+  @@index([guildId, tier])
+  @@map("depth_assignments")
+}
+
+enum PrestigeCategory {
+  MILITAR
+  EXPLORACAO
+  NAVAL
+  LOGISTICA
+  RELACOES
+  COMUNIDADE
+  CONQUISTA
+}
+
+enum PrestigeStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model PrestigeBalance {
+  id             String @id @default(cuid())
+  guildId        String
+  userId         String
+  balance        Int @default(0)
+  lifetimeEarned Int @default(0)
+  lifetimeLost   Int @default(0)
+  updatedAt      DateTime @updatedAt
+
+  @@unique([guildId, userId])
+  @@index([guildId, balance])
+  @@map("prestige_balances")
+}
+
+model PrestigeTransaction {
+  id          String @id @default(cuid())
+  guildId     String
+  userId      String
+  amount      Int
+  category    PrestigeCategory
+  reason      String
+  evidenceUrl String?
+  status      PrestigeStatus @default(PENDING)
+
+  requestedBy String
+  validatedBy String?
+  reviewNote  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([guildId, userId, createdAt])
+  @@index([guildId, status, createdAt])
+  @@map("prestige_transactions")
+}
+
+model Division {
+  id          String @id @default(cuid())
+  guildId     String
+  name        String
+  description String
+  leaderId    String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  members     DivisionMember[]
+
+  @@unique([guildId, name])
+  @@index([guildId])
+  @@map("divisions")
+}
+
+model DivisionMember {
+  id         String @id @default(cuid())
+  guildId    String
+  divisionId String
+  userId     String
+  role       String @default("Membro")
+  joinedAt   DateTime @default(now())
+  division   Division @relation(fields: [divisionId], references: [id], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+  @@index([divisionId])
+  @@map("division_members")
+}
+
+enum AffiliateStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model AffiliateFleet {
+  id          String @id @default(cuid())
+  guildId     String
+  name        String
+  captainId   String?
+  description String
+  contact     String?
+  status      AffiliateStatus @default(ACTIVE)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([guildId, name])
+  @@index([guildId, status])
+  @@map("affiliate_fleets")
+}
+
+model Conquest {
+  id          String @id @default(cuid())
+  guildId     String
+  title       String
+  description String
+  occurredAt  DateTime
+  createdBy   String
+  createdAt   DateTime @default(now())
+
+  @@index([guildId, occurredAt])
+  @@map("conquests")
+}
+
+enum FleetRecordType {
+  HISTORIA
+  DECISAO
+  EVENTO
+  MUDANCA
+  MEMORIA
+}
+
+model FleetRecord {
+  id         String @id @default(cuid())
+  guildId    String
+  title      String
+  type       FleetRecordType
+  content    String
+  occurredAt DateTime
+  createdBy  String
+  createdAt  DateTime @default(now())
+
+  @@index([guildId, occurredAt])
+  @@map("fleet_records")
+}
+
+enum ExpeditionStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model Expedition {
+  id          String @id @default(cuid())
+  guildId     String
+  title       String
+  description String
+  leaderId    String
+  status      ExpeditionStatus @default(PLANNED)
+  scheduledAt DateTime?
+  completedAt DateTime?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  members     ExpeditionMember[]
+
+  @@index([guildId, status, createdAt])
+  @@map("expeditions")
+}
+
+model ExpeditionMember {
+  id           String @id @default(cuid())
+  expeditionId String
+  userId       String
+  role         String @default("Participante")
+  joinedAt     DateTime @default(now())
+  expedition   Expedition @relation(fields: [expeditionId], references: [id], onDelete: Cascade)
+
+  @@unique([expeditionId, userId])
+  @@index([userId])
+  @@map("expedition_members")
+}
+
+model RoleGroup {
+  id        String @id @default(cuid())
+  guildId   String
+  name      String
+  roleIds   String
+  maxRoles  Int?
+  createdAt DateTime @default(now())
+
+  @@unique([guildId, name])
+  @@map("role_groups")
+}
+
+model LevelReward {
+  id      String @id @default(cuid())
+  guildId String
+  level   Int
+  roleId  String
+
+  @@unique([guildId, level, roleId])
+  @@map("level_rewards")
+}

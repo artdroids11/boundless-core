@@ -1,0 +1,18 @@
+services:
+  boundless-core:
+    build: .
+    container_name: boundless-core
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: file:/data/boundless.db
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - boundless-data:/data
+
+volumes:
+  boundless-data:

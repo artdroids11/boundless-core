@@ -1,0 +1,43 @@
+{
+  "name": "boundless-core",
+  "version": "1.0.0",
+  "description": "Bot oficial da comunidade Boundless Pirates (Rell Seas) — administração, moderação, cargos, XP e painéis interativos.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=24.17.0"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/src/index.js",
+    "start:source": "tsx src/index.ts",
+    "build": "prisma generate && tsc",
+    "postinstall": "prisma generate",
+    "deploy-commands": "tsx scripts/deploy-commands.ts",
+    "deploy-commands:prod": "node dist/scripts/deploy-commands.js",
+    "typecheck": "tsc --noEmit",
+    "check": "prisma validate && npm run typecheck",
+    "test:smoke": "npm run build && node dist/scripts/smoke-test.js",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "db:setup": "prisma db push",
+    "setup": "prisma generate && prisma db push && npm run deploy-commands && npm run build"
+  },
+  "dependencies": {
+    "discord.js": "^14.27.0",
+    "@prisma/client": "^7.0.0",
+    "@prisma/adapter-better-sqlite3": "^7.0.0",
+    "better-sqlite3": "^12.0.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "prisma": "^7.0.0",
+    "typescript": "^6.0.3",
+    "tsx": "^4.21.0",
+    "@types/node": "^24.0.0",
+    "@types/better-sqlite3": "^7.6.11"
+  }
+}

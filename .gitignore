@@ -1,0 +1,21 @@
+# Dependências
+node_modules/
+
+# Variáveis de ambiente (contém segredos — nunca versionar)
+.env
+
+# Build opcional (tsc)
+dist/
+
+# Código gerado pelo Prisma Client (é recriado por `prisma generate`)
+generated/
+
+# Banco de dados local e arquivos temporários do SQLite
+prisma/dev.db
+prisma/dev.db-journal
+*.db
+*.db-journal
+
+# Logs
+*.log
+npm-debug.log*

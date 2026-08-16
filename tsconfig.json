@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    // ESM "bundler" resolution: usado porque é o exigido pelo Prisma ORM 7
+    // (gerador "prisma-client" atual) e permite importar arquivos locais
+    // sem escrever a extensão ".js" no final de cada import relativo.
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    // TypeScript 6.0 passou a não incluir mais os tipos globais (@types/*)
+    // automaticamente. Listamos "node" explicitamente para garantir que
+    // globais do Node (process, Buffer, etc.) continuem disponíveis.
+    "types": ["node"],
+
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+
+    // Suprime avisos de depreciação já esperados na transição 6.0 → 7.0
+    // (mesma configuração que o próprio `prisma init` gera hoje).
+    "ignoreDeprecations": "6.0",
+
+    // Usados apenas por "npm run typecheck" / build opcional — a
+    // execução normal do bot roda direto do código-fonte via `tsx`.
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["src/**/*.ts", "scripts/**/*.ts"],
+  "exclude": ["node_modules", "dist", "generated"]
+}
