@@ -20,8 +20,14 @@ const command: SlashCommand = {
     .setDescription("Moderação segura com histórico e rastreabilidade.")
     .addSubcommand((sub) => memberReason(sub.setName("avisar").setDescription("Registra um aviso formal."), true))
     .addSubcommand((sub) =>
-      memberReason(sub.setName("timeout").setDescription("Aplica um timeout temporário."), true).addIntegerOption((opt: any) =>
-        opt.setName("minutos").setDescription("De 1 minuto a 28 dias").setMinValue(1).setMaxValue(40_320).setRequired(true),
+      memberReason(
+        sub
+          .setName("timeout")
+          .setDescription("Aplica um timeout temporário.")
+          .addIntegerOption((opt: any) =>
+            opt.setName("minutos").setDescription("De 1 minuto a 28 dias").setMinValue(1).setMaxValue(40_320).setRequired(true),
+          ),
+        true,
       ),
     )
     .addSubcommand((sub) => memberReason(sub.setName("remover-timeout").setDescription("Encerra um timeout."), false))
