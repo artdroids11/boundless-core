@@ -16,6 +16,8 @@ COPY tsconfig.json ./
 COPY scripts ./scripts
 COPY src ./src
 
+RUN chmod +x ./scripts/start-production.sh
+
 RUN npm run typecheck
 
 ENV NODE_ENV=production
